@@ -4,8 +4,10 @@ Lean monorepo demonstrating **Server-Driven UI (SDUI)** + **safe Generative UI**
 
 | Layer | Stack |
 | --- | --- |
-| `api/` | Python 3.12 · FastAPI · Pydantic v2 · PydanticAI |
+| `api/` | Python 3.12 · FastAPI · Pydantic v2 · PydanticAI · **uv** |
 | `web/` | Vite · React · TypeScript |
+
+Python packaging uses **[uv](https://docs.astral.sh/uv/)** (`api/pyproject.toml` + `api/uv.lock`). Do not reintroduce `requirements.txt` or pip-based install paths.
 
 Zero API keys required — the agent runs on PydanticAI `FunctionModel` / `TestModel` out of the box. Set `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` to use a real LLM.
 
@@ -49,11 +51,10 @@ Headers: `X-Client-Version` (`1` \| `2`), optional `X-Supported-Components` (com
 ## Quickstart
 
 ```bash
-# Backend
+# Backend (requires uv: https://docs.astral.sh/uv/)
 cd api
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-uvicorn app.main:app --reload --port 8000
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
 
 # Frontend (separate terminal)
 cd web
@@ -77,9 +78,12 @@ Types live in `web/src/types/sdui.ts` and mirror the Pydantic contract.
 
 ```bash
 # api/
-ALLOW_MODEL_REQUESTS=False pytest -q
+cd api
+uv sync --frozen
+ALLOW_MODEL_REQUESTS=False uv run pytest -q
 
 # web/
+cd web
 npm run typecheck && npm test && npm run build
 ```
 
