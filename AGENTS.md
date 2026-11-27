@@ -8,10 +8,16 @@ Standards for every contributor and coding agent working in this repo.
 - Keep the monorepo **lean and optimized**: zero bloat, no speculative frameworks, no “just in case” config.
 - Match existing patterns in `api/` and `web/`; do not invent parallel styles.
 
+## Python tooling (`api/`)
+
+- **`uv` is the standard Python package manager** for this repo. Runtime deps live in `[project].dependencies`; dev deps in `[dependency-groups].dev` inside `api/pyproject.toml`. Commit `api/uv.lock`.
+- Local setup / tests / run: `uv sync`, `uv sync --frozen`, `uv run pytest`, `uv run uvicorn app.main:app --reload --port 8000` (from `api/`).
+- **Do not** add or restore `requirements.txt`, parallel pip install instructions, or a second dependency list that duplicates `pyproject.toml`.
+
 ## Pull requests & CI
 
 - Ship **small, focused PRs** with a clear contract or UX outcome.
-- CI must be green before merge: backend `pytest`, frontend `typecheck` + `vitest` + `build` (see `.github/workflows/ci.yml`).
+- CI must be green before merge: backend `uv sync --frozen` + `uv run pytest`, frontend `typecheck` + `vitest` + `build` (see `.github/workflows/ci.yml`).
 - **Delete branches after merge.**
 
 ## Secrets & planning docs
